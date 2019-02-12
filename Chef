@@ -1,0 +1,190 @@
+Chef:
+
+	workstation
+	push & pull model
+	bootstap to enable communication for the first time.
+	5985,5986
+	3 tier architecture
+	
+	
+Configuration Management Tool
+	Automate 
+	
+Files:
+	starter kit 
+	
+Ports Running:
+	4321	bookshelf {while using cloud service}
+			- It is service used in AWS. {collection of cook books}
+	9683	LoadBalance {oc_bifrost service}
+	9463	oc_bifrost
+	9090	oc_id
+	8000	opscode-erchef
+				its used handle chef server
+	5432	pegretsql
+	
+	
+	
+	
+	
+	chef-server-ctl reconfigure  #To reconfigure files
+	chef-server-ctl status		 #Check the process Running OutSide
+	
+	mkdir /opt/chef
+	chef-server-ctl user-create manimike mani mike manimike@gmail.com 'zippyops' --filename manimike.pem 
+	chef-server-ctl user-list
+	chef-server-ctl org-create zcs 'Zippyops Consulting Services' --association_user manimike --filename zcs-validator.pem
+	chef-server-ctl org-list
+	
+	Installation Of Management Console:
+	
+		$ chef-server-ctl install chef-manage
+		$ chef-server-ctl reconfigure
+		$ chef-manage-ctl reconfigure
+		$ chef-manage-ctl -accept-license
+	
+	INSTALLATION OD CHEF REPORTING
+	
+		$ chef-server-ctl install opscode-reporting
+		$ chef-server-ctl reconfigure
+		$ opscode-reporting-ctl reconfigure
+		$ opscode-reporting-ctl test
+	
+	UP A NEW MACHINE (For Workstation):
+		$ unzip chef-starter.zip
+		$ works inside the .chef folder.
+		$ knife ssl fetch
+		$ knife ssl check
+		
+	RedHat Node Installation:
+		In WorkStation:
+			knife bootstrap <IP> -N <nodename>
+		
+	Debian NodeInstallation:
+		ufw allow 22
+		service ufw disable
+		
+		In WorkStation 
+			knife bootstrap 192.168.1.76 -N ubuntu.node.com --ssh-user zippyops --sudo
+
+
+	Windows Installation:
+		Powershell with Admin access
+		$ winrm quickconfig -q
+		$ Get-NetConnectionProfile
+			if Private
+		$ Set-NetConnectionProfile -NetworkCategory Private
+		$ Get-NetFirewallPortFilter | ?{$_.LocalPort -eq 5985} | Get-NetFirewallRule | ?{$_.Direction -eq "Inbound" -and $_.Profile -eq "Public" -and $_.Action -eq "Allow"} | Set-NetFirewallRule -RemoteAddress "Any"
+		##### Similarly 5986
+		$ C:> winrm e winrm/config/listener
+		$ c:> winrm get winrm/config/service
+		
+		In WorkStation
+			$ knife bootstrap windows winrm <IP> -x zippyops -N windows10
+
+		
+		
+		Chef Terms:
+			chef node
+			chef Workstation
+			chef server
+			chef solo
+			chef zero
+			
+		Chef Installation:
+		
+		chef commands:
+			chef -v
+
+		============================================================= Jan 08, 2019, 09:55:53 ==========================================================================
+		
+		
+		UBUNTU NODE INSTALLATION:
+			
+			Intall ssh server & client
+			
+				$ vi /etc/ssh/sshd_config
+				
+					LoginGraceTime 2m   		-> Disable Time
+					PermitRootLogin yes
+					StrictModes yes
+					
+				$
+				
+			
+			
+			# knife node delete windows10
+			
+			Ohai - Current State of the work
+			Supermarket - community support
+					
+			To write a receipe:
+
+				# cd cookbooks
+				# chef generate cookbook motd
+				# chef-repo/cookbooks/motd/recipes
+						default.rb			->			
+				# chef-repo/cookbooks/motd/test/integration/default
+						default_test.rb		->
+						
+				Edit default.rb
+					
+					template "/etc/motd" do
+					source "motd.erb"
+					mode "0644"
+					end
+				
+				Go to motd directory:	
+				
+				# mkdir templates attributes				
+				# mkdir templates/default
+				# vi templates/default/motd.erb
+				
+						This is my Test Message by <%= node["motd"]["author"] %>
+				
+				# vi attributes/default.rb
+							
+						default["motd"]["author"] = "zippyops"
+						
+				Upload the CookBook:
+					
+				# knife cookbook upload motd
+				
+				To configure in Run List:(Push it in runlist)		
+				
+				# knife node run_list add  
+					
+					
+			Creating Environment:
+				# chef-repo
+				# mkdir environments
+				# vi dev.rb
+				# knife environment list -w
+				# knife environment from file dev.rb
+				
+				In Node:
+				# cd /etc/chef
+				# vi client.rb	
+					
+					environment "dev"
+					
+				# chef-client
+				
+			Example:
+			
+			
+			
+			
+			
+	Test Kitchen
+
+		# yum install epel-release -y
+		# yum install docker -y
+		# systemctl start docker
+		# systemctl enable docker
+		# chef exec gem install kitchen-docker
+		# vi .kitchen.yml
+		# kitchen converge
+		# kitchen verify
+			
+			
